@@ -1,4 +1,4 @@
-# random-santa
+# random_santa
 A program to help organise a "Secret Santa".
 
 Provide it with a list of participants (name and email address), a list of
@@ -13,7 +13,8 @@ family.
 
 ### Example:
 ```
-from random-santa import secret_santa
-secret_santa("people.txt", "exclusions.txt", "credentials.txt",
-             "assignments.txt", write_to_file=True, email_for_real=True)
+from random_santa import generate_secret_santa
+generate_secret_santa("people.txt", "exclusions.txt",
+                      "credentials.txt", "assignments.txt",
+                      write_to_file=True, email_for_real=True)
 ```

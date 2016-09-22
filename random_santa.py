@@ -115,7 +115,7 @@ def build_email(assignment, from_address):
     return msg
 
 
-def secret_santa(people_file, exclusion_file, credentials_file, assignments_file,
+def generate_secret_santa(people_file, exclusion_file, credentials_file, assignments_file,
                  write_to_file=False, email_for_real=False):
     people = read_people_file(people_file)
     exclusions = read_exclusion_file(exclusion_file, people)
@@ -148,7 +148,7 @@ def secret_santa(people_file, exclusion_file, credentials_file, assignments_file
     server.quit()
 
 # Run it
-secret_santa(DEFAULT_PEOPLE_FILE,
-             DEFAULT_EXCLUSION_FILE,
-             DEFAULT_CREDENTIALS_FILE,
-             DEFAULT_ASSIGNMENTS_FILE)
+generate_secret_santa(DEFAULT_PEOPLE_FILE,
+                      DEFAULT_EXCLUSION_FILE,
+                      DEFAULT_CREDENTIALS_FILE,
+                      DEFAULT_ASSIGNMENTS_FILE)
