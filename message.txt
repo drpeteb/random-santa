@@ -1,0 +1,8 @@
+Secret Santa Assignment
+HO HO HO!
+
+Hi there {giver}. Santa here. I've been asked to help set up the Secret Santa this
+year. I've drawn names out of a hat, and determined that you should get a
+present for {receiver}.
+
+Merry Christmas!

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import numpy as np
 import smtplib
 from email.mime.text import MIMEText
@@ -5,22 +7,11 @@ from email.mime.text import MIMEText
 NUM_TRIES = 100
 
 DEFAULT_PEOPLE_FILE = "people.txt"
-DEFAULT_EXCLUSION_FILE = "exclusions.txt"
+DEFAULT_EXCLUSIONS_FILE = "exclusions.txt"
+DEFAULT_MESSAGE_FILE = "message.txt"
 DEFAULT_CREDENTIALS_FILE = "credentials.txt"
-DEFAULT_ASSIGNMENTS_FILE = "assignments.txt"
+DEFAULT_OUTPUT_FILE = "output.txt"
 
-MESSAGE_SUBJECT = "Secret Santa Assignment"
-MESSAGE_TEMPLATE = """
-HO HO HO!
-
-THIS IS A TEST.
-
-Hi there {}. Santa here. I've been asked to help set up the Secret Santa this
-year. I've drawn names out of a hat, and determined that you should get a
-present for {}. Merry Christmas!
-
-HO HO HO!
-"""
 
 def read_people_file(path):
     people = [] # list of (name, email) tuples
@@ -53,6 +44,20 @@ def read_exclusion_file(path, people):
                 raise RuntimeError("Unrececognised name: " + obj)
             exclusions.append((subj, obj))
     return exclusions
+
+
+def read_credentials_file(path):
+    with open(path) as f:
+        username = f.readline().strip()
+        password = f.readline().strip()
+    return (username, password)
+
+
+def read_message_file(path):
+    with open(path) as f:
+        subject = f.readline().strip()
+        body = "".join(f.readlines())
+    return (subject, body)
 
 
 def build_random_graph(people, exclusions):
@@ -97,33 +102,30 @@ def build_random_graph(people, exclusions):
         if len(assignments) == num_people:
             return assignments
 
-    return []
+    raise RuntimeError("Failed to find a valid set of present assignment. "
+                       "Sorry about that. Try removing some exclsuions.")
 
 
-def load_credentials(path):
-    with open(path) as f:
-        username = f.readline().strip()
-        password = f.readline().strip()
-    return (username, password)
-
-
-def build_email(assignment, from_address):
-    msg = MIMEText(MESSAGE_TEMPLATE.format(assignment[0][0], assignment[1][0]))
-    msg['Subject'] = MESSAGE_SUBJECT
+def build_email(assignment, from_address, subject, body):
+    msg = MIMEText(body.format(giver=assignment[0][0], receiver=assignment[1][0]))
+    msg['Subject'] = subject
     msg['From'] = from_address
     msg['To'] = assignment[0][1]
     return msg
 
 
-def generate_secret_santa(people_file, exclusion_file, credentials_file, assignments_file,
-                 write_to_file=False, email_for_real=False):
+def go_go_secret_santa(people_file, exclusions_file,
+                       credentials_file, message_file, output_file,
+                       write_to_file=False, email_for_real=False):
     people = read_people_file(people_file)
-    exclusions = read_exclusion_file(exclusion_file, people)
-    assignments = build_random_graph(people, exclusions)
-    credentials = load_credentials(credentials_file)
+    exclusions = read_exclusion_file(exclusions_file, people)
+    subject, body = read_message_file(message_file)
+    credentials = read_credentials_file(credentials_file)
     from_address = credentials[0] + "@gmail.com"
 
-    with open(assignments_file, 'w') as f:
+    assignments = build_random_graph(people, exclusions)
+
+    with open(output_file, 'w') as f:
         for a in assignments:
             s = a[0][0] + " gets something for " + a[1][0]
             if write_to_file:
@@ -143,12 +145,14 @@ def generate_secret_santa(people_file, exclusion_file, credentials_file, assignm
                                          "python -m smtpd -n -c DebuggingServer localhost:1025")
 
     for a in assignments:
-        msg = build_email(a, from_address)
+        msg = build_email(a, from_address, subject, body)
         server.send_message(msg)
     server.quit()
 
 # Run it
-generate_secret_santa(DEFAULT_PEOPLE_FILE,
-                      DEFAULT_EXCLUSION_FILE,
-                      DEFAULT_CREDENTIALS_FILE,
-                      DEFAULT_ASSIGNMENTS_FILE)
+if __name__ == "__main__":
+    go_go_secret_santa(DEFAULT_PEOPLE_FILE,
+                       DEFAULT_EXCLUSIONS_FILE,
+                       DEFAULT_CREDENTIALS_FILE,
+                       DEFAULT_MESSAGE_FILE,
+                       DEFAULT_OUTPUT_FILE)
