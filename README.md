@@ -15,6 +15,27 @@ family.
 ```
 from random_santa import generate_secret_santa
 generate_secret_santa("people.txt", "exclusions.txt",
-                      "credentials.txt", "assignments.txt",
+                      "credentials.txt", "output.txt",
                       write_to_file=True, email_for_real=True)
+```
+
+##### people.txt
+```
+Alice, alice@example.com
+Bob, bob@example.com
+Charlie, charlie@example.com
+Danielle, danielle@example.com
+Ethelred, ethelred@example.com
+```
+
+##### exclusions.txt
+```
+Alice, Bob
+Bob, Alice
+```
+
+##### credentials.txt
+```
+my.gmail.user.name
+MyGM4ilPassW0RD
 ```
